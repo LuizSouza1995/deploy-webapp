@@ -1,0 +1,35 @@
+{
+  "name": "deploy-webapp",
+  "version": "1.0.22",
+  "description": "Script para deploy de esteiras no WebApp.",
+  "main": "dist/0_index.js",
+  "bin": {
+    "deploy-webapp": "./dist/0_index.js"
+  },
+  "files": [
+    "dist",
+    "src/utils/*.csv",
+    "src/utils/*.json",
+    "install.js",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "ts-node src/0_index.ts",
+    "build": "tsc",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run build",
+    "postinstall": "node install.js"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "csvtojson": "^2.0.10",
+    "dotenv": "^17.2.3",
+    "fs": "^0.0.1-security",
+    "ts-node-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

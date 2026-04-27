@@ -1,0 +1,43 @@
+# Dependências
+node_modules/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Arquivos de desenvolvimento
+*.log
+*.tsbuildinfo
+
+# Arquivos de histórico (gerados em runtime)
+src/utils/history_*.txt
+
+# Arquivos fonte TypeScript (apenas dist será incluído)
+src/**/*.ts
+!src/utils/*.csv
+!src/utils/*.json
+
+# Incluir install.js (necessário para postinstall)
+!install.js
+
+# Arquivos de configuração do editor (mas vamos incluir .vscode/settings.json para fechar node_modules)
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de teste (se houver)
+test/
+tests/
+*.test.ts
+*.spec.ts
+
+# Arquivos temporários
+*.tmp
+.cache/
+
