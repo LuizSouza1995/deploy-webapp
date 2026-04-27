@@ -1,4 +1,0 @@
-{
-    "flow_form_id": "97038d22-82cf-40c7-868f-5f260446674e",
-    "updateWorkflowProtocolFunction": "return {\r\n    optional_config: {\r\n    ...workflowProtocol?.optional_config,\r\n    pendency_button: {\r\n        system: true,\r\n        backoffice: true,\r\n        lojista: true,\r\n        parceiro: true,\r\n        colaborador: true,\r\n        parceiro_fotovoltaico: true,\r\n        lojista_fotovoltaico: true,\r\n        colaborador_fotovoltaico: true,\r\n        parceiro_saude: true,\r\n        lojista_saude: true,\r\n        colaborador_saude: true\r\n    }\r\n    }\r\n}"
-}
