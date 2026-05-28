@@ -1,7 +1,7 @@
 import axios from "axios";
 import { log } from "console";
 import { cor, replacementRules, urlPROD, urlQA, addIdUpdated, addIdsCreated, checkIdUpdated } from "../utils/constants";
-import { deleteKeys, omitNullProperties, sanitizeWorkflowFormData } from "../utils/data-processing";
+import { deleteKeys, omitNullProperties, sanitizeWorkflowFormData, sanitizeWorkflowStepData } from "../utils/data-processing";
 import { Token } from "../utils/types";
 import { replaceStringsRecursively } from "../utils/replace-utils";
 
@@ -144,10 +144,7 @@ export const createPROD = async (access_token: Token, data: any, client: string,
       }
       payload = data;
     } else if (type === "workflow-step") {
-      payload = data;
-      if (payload.description == null || (typeof payload.description === "string" && payload.description.trim().length === 0)) {
-        payload.description = "   ";
-      }
+      payload = sanitizeWorkflowStepData(data);
     } else {
       payload = data;
     }
@@ -227,13 +224,12 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
         }
         payload = data;
       } else if (type === "workflow-step") {
-        payload = data;
-        if (payload.description == null || (typeof payload.description === "string" && payload.description.trim().length === 0)) {
-          payload.description = "   ";
-        }
+        payload = sanitizeWorkflowStepData(data);
       } else {
         payload = data;
       }
+
+      payload = replaceStringsRecursively(payload, replacementRules);
 
       let { data: updateData } = await axios.put(
         `${urlPROD}/${client}/${Service_key}/${params}`,
@@ -244,8 +240,6 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
           },
         }
       );
-
-      payload = replaceStringsRecursively(payload, replacementRules);
 
       log(`${cor.Green}Updated ${type} ${id} in PROD Success${cor.Reset}`);
       addIdUpdated(id, type);

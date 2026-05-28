@@ -89,7 +89,7 @@ const runMigration = async () => {
             await (0, qa_client_1.publishWorkflowQA)(access_token_qa, info.id, constants_1.client, constants_1.serviceKey, `techforms/workflow/${info.id}`, "workflow");
             //////////////////////// WORKFLOW ////////////////////////
             const workflow = await (0, qa_client_1.getQA)(access_token_qa, undefined, constants_1.client, constants_1.serviceKey, `techforms/workflow/${info.id}`, "workflow", info.id);
-            const groupItems = workflow.workflow_group_item || [];
+            // const groupItems = workflow.workflow_group_item || [];
             if (!workflow) {
                 (0, console_1.log)(`${constants_1.cor.Blue}Workflow ${info.id} not found in QA${constants_1.cor.Reset}`);
                 return;
@@ -97,7 +97,7 @@ const runMigration = async () => {
             await (0, _1_workflow_1.Workflow)(access_token_qa, access_token_prod, workflow, constants_1.client, constants_1.serviceKey, info.id, updateWorkflowData);
             //////////////////////// WORKFLOW STEPS ////////////////////////
             const workflowSteps = workflow.workflow_steps;
-            await (0, _2_workflow_step_1.WorkflowSteps)(workflowSteps, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, undefined, undefined, updateWorkflowData);
+            await (0, _2_workflow_step_1.WorkflowSteps)(workflowSteps, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, info.id, undefined, updateWorkflowData);
             //////////////////////// CLIENT-FUNCTION ////////////////////////
             const update_workflow_protocol_function_id = workflow.update_workflow_protocol_function_id;
             await (0, _3_client_function_1.ClientFunction)(update_workflow_protocol_function_id, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, updateWorkflowData);

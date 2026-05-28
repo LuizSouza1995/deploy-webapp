@@ -74,7 +74,7 @@ export const runMigration = async () => {
 
       //////////////////////// WORKFLOW STEPS ////////////////////////
       const workflowSteps = workflow.workflow_steps;
-      await WorkflowSteps(workflowSteps, access_token_qa, access_token_prod, client, serviceKey, undefined, undefined, updateWorkflowData);
+      await WorkflowSteps(workflowSteps, access_token_qa, access_token_prod, client, serviceKey, info.id, undefined, updateWorkflowData);
 
       //////////////////////// CLIENT-FUNCTION ////////////////////////
       const update_workflow_protocol_function_id = workflow.update_workflow_protocol_function_id;

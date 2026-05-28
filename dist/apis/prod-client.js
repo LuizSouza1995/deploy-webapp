@@ -215,7 +215,8 @@ const updatePROD = async (access_token, data, client, Service_key, params, type,
                     workflow_key: data.workflow_key,
                     get_external_identification_function: data.get_external_identification_function,
                     get_main_user_account_data_function: data.get_main_user_account_data_function,
-                    client_service_id: data.client_service_id,
+                    client_service_id: data.client_service_id === "2ace827e-3378-4c1b-a5bc-5174109e6892" ? "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729" : data.client_service_id,
+                    // client_service_id: "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729",
                     update_workflow_protocol_function_id: data.update_workflow_protocol_function_id,
                 };
                 payload = (0, data_processing_1.omitNullProperties)(payload);

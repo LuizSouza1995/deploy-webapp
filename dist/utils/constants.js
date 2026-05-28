@@ -51,6 +51,13 @@ exports.OLD_MOCK = `let mock = true`;
 exports.NEW_MOCK = `let mock = false`;
 exports.ENV_QA = `env = 'hml'`;
 exports.ENV_PROD = `env = 'prod'`;
+/////////////////////// REVERSÃO DE AMBIENTES
+// export const OLD_ENV = `configEnv["prod"]`;
+// export const NEW_ENV = `configEnv["qa"]`;
+// export const OLD_MOCK = `let mock = false`;
+// export const NEW_MOCK = `let mock = true`;
+// export const ENV_QA = `env = 'prod'`;
+// export const ENV_PROD = `env = 'hml'`;
 exports.replacementRules = [
     { from: exports.urlQA, to: exports.urlPROD },
     { from: exports.clientIdQA, to: exports.clientIdPROD },

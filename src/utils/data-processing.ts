@@ -35,6 +35,28 @@ export function deleteKeys<T extends Record<string, any>>(obj: T, keys: string[]
   return obj;
 }
 
+/** Workflow-step PROD body: nested relations break PUT (missing workflow_step_id on nested forms). */
+export function sanitizeWorkflowStepData(stepData: any): Record<string, any> {
+  if (!stepData || typeof stepData !== "object") return stepData;
+  const payload: Record<string, any> = {
+    title: stepData.title,
+    description: stepData.description,
+    workflow_step_key: stepData.workflow_step_key,
+    index: stepData.index,
+    filters: stepData.filters,
+    required: stepData.required,
+    optional_config: stepData.optional_config,
+    pendency_step: stepData.pendency_step,
+  };
+  if (
+    payload.description == null ||
+    (typeof payload.description === "string" && payload.description.trim().length === 0)
+  ) {
+    payload.description = "   ";
+  }
+  return omitNullProperties(payload);
+}
+
 /** Shallow copy: drops keys whose value is `null` (axios/JSON would send null otherwise). */
 export function omitNullProperties(obj: Record<string, any>): Record<string, any> {
   if (!obj || typeof obj !== "object") return obj;

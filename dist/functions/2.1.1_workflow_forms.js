@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WorkflowForms = WorkflowForms;
 const prod_client_1 = require("../apis/prod-client");
 const qa_client_1 = require("../apis/qa-client");
-const _3_client_function_1 = require("./3_client_function");
 async function WorkflowForms(workflowForm, access_token_qa, access_token_prod, client, serviceKey, workflow_id, updateWorkflowData) {
     var _a;
     //////////////////////// WORKFLOW FORMS ////////////////////////
@@ -32,10 +31,5 @@ async function WorkflowForms(workflowForm, access_token_qa, access_token_prod, c
     }
     else {
         await (0, prod_client_1.createPROD)(access_token_prod, workflowFormData, client, serviceKey, `techforms/workflow-form/${workflowFormId}`, "workflow-form", workflowFormId, updateWorkflowData);
-    }
-    //////////////////////// CLIENT FUNCTION ////////////////////////
-    const formatPayloadFunctionId = workflowFormData === null || workflowFormData === void 0 ? void 0 : workflowFormData.format_payload_function_id;
-    if (formatPayloadFunctionId) {
-        await (0, _3_client_function_1.ClientFunction)(formatPayloadFunctionId, access_token_qa, access_token_prod, client, serviceKey, updateWorkflowData);
     }
 }
