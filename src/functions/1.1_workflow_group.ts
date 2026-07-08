@@ -1,5 +1,6 @@
 import { log } from "console";
 import { createPROD, getPROD, updatePROD } from "../apis/prod-client";
+import { isNotFoundError } from "../utils/data-processing";
 import { getQA } from "../apis/qa-client";
 import { Token } from "../utils/types";
 import { cor } from "../utils/constants";
@@ -12,7 +13,7 @@ export async function WorkflowGroup(groupId: any, access_token_qa: Token, access
         try {
             await getPROD(access_token_prod, undefined, client!, serviceKey!, `techforms/workflow-group/${groupId}`, "workflow-group", groupId);
         } catch (err: any) {
-            if (err?.response?.status === 404) {
+            if (isNotFoundError(err)) {
                 groupExistsInProd = false;
             } else {
                 throw err;

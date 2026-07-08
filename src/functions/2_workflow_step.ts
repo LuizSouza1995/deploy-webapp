@@ -1,3 +1,4 @@
+import { isNotFoundError } from "../utils/data-processing";
 import { createPROD, getPROD, updatePROD } from "../apis/prod-client";
 import { getQA } from "../apis/qa-client";
 import { Token } from "../utils/types";
@@ -13,7 +14,7 @@ export async function WorkflowSteps(workflowSteps: any, access_token_qa: Token, 
             try {
                 await getPROD(access_token_prod, undefined, client!, serviceKey!, `techforms/workflow/${workflow_id}/workflow-step/${step.id}`, "workflow-step", step.id);
             } catch (err: any) {
-                if (err?.response?.status === 404) {
+                if (isNotFoundError(err)) {
                     workflowStepExistsInProd = false;
                 } else {
                     throw err;
@@ -27,7 +28,7 @@ export async function WorkflowSteps(workflowSteps: any, access_token_qa: Token, 
             }
 
             //////////////////////// WORKFLOW STEPS FORMS ////////////////////////
-            const workflowStepsForms = workflowStepData?.workflow_step_forms;
+            const workflowStepsForms = workflowStepData?.workflow_step_forms ?? [];
             for (const stepForm of workflowStepsForms) {
                 const workflowStepFormData = await getQA(access_token_qa, undefined, client!, serviceKey!, `techforms/workflow/${workflow_id}/workflow-step/${step.id}/workflow-step-form/${stepForm.id}`, "workflow-step-form", stepForm.id);
                 await WorkflowStepForms(workflowStepFormData, access_token_qa, access_token_prod, client!, serviceKey!, workflow_id!, step.id, updateWorkflowData);

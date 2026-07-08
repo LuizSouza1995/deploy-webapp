@@ -41,9 +41,11 @@ const constants_1 = require("./utils/constants");
 const qa_client_1 = require("./apis/qa-client");
 const prod_client_1 = require("./apis/prod-client");
 const _2_workflow_step_1 = require("./functions/2_workflow_step");
+const _2_1_1_workflow_forms_1 = require("./functions/2.1.1_workflow_forms");
 const _3_client_function_1 = require("./functions/3_client_function");
 const _4_workflow_form_groups_1 = require("./functions/4_workflow_form_groups");
 const _1_workflow_1 = require("./functions/1_workflow");
+const data_processing_1 = require("./utils/data-processing");
 const runMigration = async () => {
     if (!constants_1.emailLoginQA || !constants_1.passwordLoginQA || !constants_1.emailLoginPROD || !constants_1.passwordLoginPROD || !constants_1.client || !constants_1.serviceKey) {
         throw new Error("Variáveis de ambiente WEBAPP_QA_EMAIL_LOGIN, WEBAPP_QA_PASSWORD_LOGIN, WEBAPP_PROD_EMAIL_LOGIN, WEBAPP_PROD_PASSWORD_LOGIN, CLIENT_ID e/ou SERVICE_KEY não definidas");
@@ -98,6 +100,11 @@ const runMigration = async () => {
             //////////////////////// WORKFLOW STEPS ////////////////////////
             const workflowSteps = workflow.workflow_steps;
             await (0, _2_workflow_step_1.WorkflowSteps)(workflowSteps, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, info.id, undefined, updateWorkflowData);
+            //////////////////////// WORKFLOW FORMS FILHOS (snapshot compilado) ////////////////////////
+            const childFormIds = (0, data_processing_1.collectChildFormIdsFromWorkflow)(workflow);
+            for (const childFormId of childFormIds) {
+                await (0, _2_1_1_workflow_forms_1.WorkflowForms)({ id: childFormId }, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, info.id, updateWorkflowData);
+            }
             //////////////////////// CLIENT-FUNCTION ////////////////////////
             const update_workflow_protocol_function_id = workflow.update_workflow_protocol_function_id;
             await (0, _3_client_function_1.ClientFunction)(update_workflow_protocol_function_id, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, updateWorkflowData);

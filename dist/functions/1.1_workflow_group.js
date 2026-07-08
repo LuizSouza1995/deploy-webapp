@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WorkflowGroup = WorkflowGroup;
 const console_1 = require("console");
 const prod_client_1 = require("../apis/prod-client");
+const data_processing_1 = require("../utils/data-processing");
 const qa_client_1 = require("../apis/qa-client");
 const constants_1 = require("../utils/constants");
 async function WorkflowGroup(groupId, access_token_qa, access_token_prod, client, serviceKey, workflow_id, updateWorkflowData, workflowProd, workflow) {
-    var _a;
     if (groupId && client && serviceKey && workflow_id) {
         const workflowGroup = await (0, qa_client_1.getQA)(access_token_qa, undefined, client, serviceKey, `techforms/workflow-group/${groupId}`, "workflow-group", groupId);
         //////////////////////// WORKFLOW-GROUP ////////////////////////
@@ -15,7 +15,7 @@ async function WorkflowGroup(groupId, access_token_qa, access_token_prod, client
             await (0, prod_client_1.getPROD)(access_token_prod, undefined, client, serviceKey, `techforms/workflow-group/${groupId}`, "workflow-group", groupId);
         }
         catch (err) {
-            if (((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.status) === 404) {
+            if ((0, data_processing_1.isNotFoundError)(err)) {
                 groupExistsInProd = false;
             }
             else {

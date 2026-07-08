@@ -1,5 +1,4 @@
 {
   "flow_form_id": "81cb37f8-86b0-4af1-befa-3d44a763b96a",
-  "protocol_provider": "force",
-  "updateWorkflowProtocolFunction": "return {\r\n    optional_config: {\r\n        ...workflowProtocol?.optional_config,\r\n        pendency_button: {\r\n            clerk: true,\r\n            person: true,\r\n            seller: true,\r\n            company: true,\r\n            backoffice: true,\r\n            provider: true,\r\n            advisor: true,\r\n            broker_frotas: true,\r\n            advisor_piloto: true,\r\n            corretor_piloto: true,\r\n            broker: true,\r\n        },\r\n        reopen_protocol_button: {\r\n            assessor: true,\r\n            clerk: true,\r\n            broker: true,\r\n            person: true,\r\n            seller: true,\r\n            company: true,\r\n            backoffice: true,\r\n            provider: true,\r\n            advisor: true,\r\n            backoffice_financeiro: true,\r\n            operator: true\r\n        }\r\n    }\r\n}"
+  "protocol_provider": "force"
 }

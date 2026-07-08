@@ -1,4 +1,5 @@
 import { createPROD, getPROD, updatePROD } from "../apis/prod-client";
+import { isNotFoundError } from "../utils/data-processing";
 import { getQA } from "../apis/qa-client";
 import { Token } from "../utils/types";
 import { WorkflowForms } from "./2.1.1_workflow_forms";
@@ -11,7 +12,7 @@ export async function WorkflowFormGroups(workflowFormGroupQA: any, access_token_
             try {
                 await getPROD(access_token_prod, undefined, client!, serviceKey!, `techforms/workflow/${workflow_id}/workflow-form/null/workflow-form-group/${formGroup.id}`, "workflow-form-group", formGroup.id);
             } catch (err: any) {
-                if (err?.response?.status === 404) {
+                if (isNotFoundError(err)) {
                     workflowFormGroupExistsInProd = false;
                 } else {
                     throw err;

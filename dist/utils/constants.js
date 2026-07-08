@@ -81,27 +81,37 @@ function addIdUpdated(id, type) {
     const historyPath = path_1.default.resolve(logsDirectory, "history_updated.txt");
     fs_1.default.appendFileSync(historyPath, ` ${type}: ${id}\n`);
 }
+function historyEntryKey(type, id) {
+    return `${type}:${id}`;
+}
 function addIdsCreated(id, type) {
     const historyPath = path_1.default.resolve(logsDirectory, "history_created.txt");
     fs_1.default.appendFileSync(historyPath, ` ${type}: ${id}\n`);
 }
-function checkIdUpdated(id) {
+function checkIdUpdated(id, type) {
     const historyPath = path_1.default.resolve(logsDirectory, "history_updated.txt");
     if (!fs_1.default.existsSync(historyPath)) {
         return false;
     }
     const history = fs_1.default.readFileSync(historyPath, "utf8");
     const lines = history.split("\n");
+    const typedKey = type ? historyEntryKey(type, id) : null;
     for (const line of lines) {
         const trimmedLine = line.trim();
         if (!trimmedLine)
             continue;
-        const parts = trimmedLine.split(":");
-        if (parts.length >= 2) {
-            const lineId = parts[parts.length - 1].trim();
-            if (lineId === id) {
+        const separatorIndex = trimmedLine.indexOf(":");
+        if (separatorIndex === -1)
+            continue;
+        const lineType = trimmedLine.slice(0, separatorIndex).trim();
+        const lineId = trimmedLine.slice(separatorIndex + 1).trim();
+        if (type) {
+            if (historyEntryKey(lineType, lineId) === typedKey) {
                 return true;
             }
+        }
+        else if (lineId === id) {
+            return true;
         }
     }
     return false;

@@ -70,7 +70,10 @@ const getPROD = async (access_token, data, client, Service_key, params, type, id
             },
         });
         if (type === "workflow-form" && data === "") {
-            return null;
+            throw {
+                status: 404,
+                error: "Data not found",
+            };
         }
         (0, data_processing_1.deleteKeys)(data, [
             "created_at",
@@ -128,7 +131,6 @@ const createPROD = async (access_token, data, client, Service_key, params, type,
             }
         }
         else if (type === "update-workflow-protocol-function") {
-            data.function = jsonData.updateWorkflowProtocolFunction || data.function;
             payload = data;
         }
         else if (type === "workflow") {
@@ -139,22 +141,26 @@ const createPROD = async (access_token, data, client, Service_key, params, type,
             payload = (0, data_processing_1.omitNullProperties)(Object.assign({}, data));
         }
         else if (type === "workflow-step-form") {
-            if (data.has_next_workflow_form === null || data.has_previous_workflow_form === null) {
-                data.has_next_workflow_form = false;
-            }
-            payload = data;
+            payload = (0, data_processing_1.sanitizeWorkflowStepFormData)(data);
+            payload.id = id;
         }
         else if (type === "workflow-step") {
-            payload = data;
-            if (payload.description == null || (typeof payload.description === "string" && payload.description.trim().length === 0)) {
-                payload.description = "   ";
-            }
+            payload = (0, data_processing_1.sanitizeWorkflowStepData)(data);
+            payload.id = id;
+        }
+        else if (type === "workflow-group") {
+            payload = (0, data_processing_1.sanitizeWorkflowGroupData)(data, false);
+        }
+        else if (type === "workflow-group-item") {
+            const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
+            payload = (0, data_processing_1.sanitizeWorkflowGroupItemData)(data, groupIdMatch === null || groupIdMatch === void 0 ? void 0 : groupIdMatch[1]);
         }
         else {
             payload = data;
         }
         payload = (0, replace_utils_1.replaceStringsRecursively)(payload, constants_1.replacementRules);
-        let { data: createData } = await axios_1.default.post(`${constants_1.urlPROD}/${client}/${Service_key}/${params}`, payload, {
+        const createParams = type === "workflow-step-form" ? `${params}/${id}` : params;
+        let { data: createData } = await axios_1.default.post(`${constants_1.urlPROD}/${client}/${Service_key}/${createParams}`, payload, {
             headers: {
                 Authorization: `Bearer ${access_token}`,
             },
@@ -172,7 +178,7 @@ exports.createPROD = createPROD;
 const updatePROD = async (access_token, data, client, Service_key, params, type, id, jsonData) => {
     var _a, _b, _c;
     try {
-        if (!(0, constants_1.checkIdUpdated)(id)) {
+        if (!(0, constants_1.checkIdUpdated)(id, type)) {
             let payload;
             if (type === "workflow-form") {
                 payload = (0, data_processing_1.sanitizeWorkflowFormData)(data);
@@ -194,8 +200,6 @@ const updatePROD = async (access_token, data, client, Service_key, params, type,
                 }
             }
             else if (type === "update-workflow-protocol-function") {
-                id = "9a37558f-1f11-4544-9a31-754e24883673";
-                data.function = jsonData.updateWorkflowProtocolFunction;
                 payload = data;
             }
             else if (type === "workflow") {
@@ -222,26 +226,27 @@ const updatePROD = async (access_token, data, client, Service_key, params, type,
                 payload = (0, data_processing_1.omitNullProperties)(payload);
             }
             else if (type === "workflow-step-form") {
-                if (data.has_next_workflow_form === null || data.has_previous_workflow_form === null) {
-                    data.has_next_workflow_form = false;
-                }
-                payload = data;
+                payload = (0, data_processing_1.sanitizeWorkflowStepFormData)(data);
             }
             else if (type === "workflow-step") {
-                payload = data;
-                if (payload.description == null || (typeof payload.description === "string" && payload.description.trim().length === 0)) {
-                    payload.description = "   ";
-                }
+                payload = (0, data_processing_1.sanitizeWorkflowStepData)(data);
+            }
+            else if (type === "workflow-group") {
+                payload = (0, data_processing_1.sanitizeWorkflowGroupData)(data, true);
+            }
+            else if (type === "workflow-group-item") {
+                const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
+                payload = (0, data_processing_1.sanitizeWorkflowGroupItemData)(data, groupIdMatch === null || groupIdMatch === void 0 ? void 0 : groupIdMatch[1]);
             }
             else {
                 payload = data;
             }
+            payload = (0, replace_utils_1.replaceStringsRecursively)(payload, constants_1.replacementRules);
             let { data: updateData } = await axios_1.default.put(`${constants_1.urlPROD}/${client}/${Service_key}/${params}`, payload, {
                 headers: {
                     Authorization: `Bearer ${access_token}`,
                 },
             });
-            payload = (0, replace_utils_1.replaceStringsRecursively)(payload, constants_1.replacementRules);
             (0, console_1.log)(`${constants_1.cor.Green}Updated ${type} ${id} in PROD Success${constants_1.cor.Reset}`);
             (0, constants_1.addIdUpdated)(id, type);
             return updateData;
@@ -250,7 +255,7 @@ const updatePROD = async (access_token, data, client, Service_key, params, type,
     catch (error) {
         (0, console_1.log)(`${constants_1.cor.Red}Update ${type} ${id} in PROD Error: ${JSON.stringify(((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || ((_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.error) || error.message || error.stack || error)}${constants_1.cor.Reset}`);
         if ((error === null || error === void 0 ? void 0 : error.status) === 404) {
-            (0, exports.createPROD)(access_token, data, client, Service_key, params, type, id, data);
+            (0, exports.createPROD)(access_token, data, client, Service_key, params, type, id, jsonData);
         }
         throw error;
     }

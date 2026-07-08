@@ -1,4 +1,5 @@
 import { createPROD, getPROD, updatePROD } from "../apis/prod-client";
+import { isNotFoundError } from "../utils/data-processing";
 import { Token } from "../utils/types";
 import { WorkflowGroup } from "./1.1_workflow_group";
 import { WorkflowGroupItem } from "./1.2_workflow_group_item";
@@ -11,7 +12,7 @@ export async function Workflow(access_token_qa: Token, access_token_prod: Token,
         try {
             await getPROD(access_token_prod, undefined, client!, serviceKey!, `techforms/workflow/${id}`, "workflow", id);
         } catch (err: any) {
-            if (err?.response?.status === 404) {
+            if (isNotFoundError(err)) {
                 workflowProd = false;
             } else {
                 throw err;

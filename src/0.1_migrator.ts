@@ -6,9 +6,11 @@ import { Token, WorkflowsIds } from "./utils/types";
 import { getQA, loginQA, publishWorkflowQA } from "./apis/qa-client";
 import { loginPROD, publishWorkflowPROD } from "./apis/prod-client";
 import { WorkflowSteps } from "./functions/2_workflow_step";
+import { WorkflowForms } from "./functions/2.1.1_workflow_forms";
 import { ClientFunction } from "./functions/3_client_function";
 import { WorkflowFormGroups } from "./functions/4_workflow_form_groups";
 import { Workflow } from "./functions/1_workflow";
+import { collectChildFormIdsFromWorkflow } from "./utils/data-processing";
 
 export const runMigration = async () => {
   if (!emailLoginQA || !passwordLoginQA || !emailLoginPROD || !passwordLoginPROD || !client || !serviceKey) {
@@ -75,6 +77,12 @@ export const runMigration = async () => {
       //////////////////////// WORKFLOW STEPS ////////////////////////
       const workflowSteps = workflow.workflow_steps;
       await WorkflowSteps(workflowSteps, access_token_qa, access_token_prod, client, serviceKey, info.id, undefined, updateWorkflowData);
+
+      //////////////////////// WORKFLOW FORMS FILHOS (snapshot compilado) ////////////////////////
+      const childFormIds = collectChildFormIdsFromWorkflow(workflow);
+      for (const childFormId of childFormIds) {
+        await WorkflowForms({ id: childFormId }, access_token_qa, access_token_prod, client!, serviceKey!, info.id!, updateWorkflowData);
+      }
 
       //////////////////////// CLIENT-FUNCTION ////////////////////////
       const update_workflow_protocol_function_id = workflow.update_workflow_protocol_function_id;

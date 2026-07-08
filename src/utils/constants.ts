@@ -83,12 +83,16 @@ export function addIdUpdated(id: string, type: string) {
   fs.appendFileSync(historyPath, ` ${type}: ${id}\n`);
 }
 
+function historyEntryKey(type: string, id: string) {
+  return `${type}:${id}`;
+}
+
 export function addIdsCreated(id: string, type: string) {
   const historyPath = path.resolve(logsDirectory, "history_created.txt");
   fs.appendFileSync(historyPath, ` ${type}: ${id}\n`);
 }
 
-export function checkIdUpdated(id: string) {
+export function checkIdUpdated(id: string, type?: string) {
   const historyPath = path.resolve(logsDirectory, "history_updated.txt");
 
   if (!fs.existsSync(historyPath)) {
@@ -97,17 +101,24 @@ export function checkIdUpdated(id: string) {
 
   const history = fs.readFileSync(historyPath, "utf8");
   const lines = history.split("\n");
+  const typedKey = type ? historyEntryKey(type, id) : null;
 
   for (const line of lines) {
     const trimmedLine = line.trim();
     if (!trimmedLine) continue;
 
-    const parts = trimmedLine.split(":");
-    if (parts.length >= 2) {
-      const lineId = parts[parts.length - 1].trim();
-      if (lineId === id) {
+    const separatorIndex = trimmedLine.indexOf(":");
+    if (separatorIndex === -1) continue;
+
+    const lineType = trimmedLine.slice(0, separatorIndex).trim();
+    const lineId = trimmedLine.slice(separatorIndex + 1).trim();
+
+    if (type) {
+      if (historyEntryKey(lineType, lineId) === typedKey) {
         return true;
       }
+    } else if (lineId === id) {
+      return true;
     }
   }
 

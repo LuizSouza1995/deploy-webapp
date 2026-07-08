@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.publishWorkflowQA = exports.getQA = exports.loginQA = void 0;
+exports.publishWorkflowQA = exports.listQAChildFormsByFatherId = exports.getQA = exports.loginQA = void 0;
 const axios_1 = __importDefault(require("axios"));
 const console_1 = require("console");
 const constants_1 = require("../utils/constants");
@@ -69,6 +69,30 @@ const getQA = async (access_token, data, client, Service_key, params, type, id) 
     }
 };
 exports.getQA = getQA;
+const listQAChildFormsByFatherId = async (access_token, client, Service_key, fatherId) => {
+    var _a, _b, _c, _d;
+    try {
+        const params = new URLSearchParams();
+        params.append("field", "workflow_form_father_id");
+        params.append("value", fatherId);
+        params.append("conditional", "=");
+        params.append("operator", "and");
+        params.set("size", "500");
+        const { data } = await axios_1.default.get(`${constants_1.urlQA}/${client}/${Service_key}/techforms/workflow-form?${params.toString()}`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        });
+        const items = Array.isArray(data === null || data === void 0 ? void 0 : data.data) ? data.data : Array.isArray(data) ? data : [];
+        (0, console_1.log)(`${constants_1.cor.White}List workflow-form children of ${fatherId} in QA Success (${items.length})${constants_1.cor.Reset}`);
+        return items;
+    }
+    catch (error) {
+        (0, console_1.log)(`${constants_1.cor.Red}List workflow-form children of ${fatherId} in QA Error: ${((_b = (_a = error.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message) || ((_d = (_c = error.response) === null || _c === void 0 ? void 0 : _c.data) === null || _d === void 0 ? void 0 : _d.error)}${constants_1.cor.Reset}`);
+        return [];
+    }
+};
+exports.listQAChildFormsByFatherId = listQAChildFormsByFatherId;
 const publishWorkflowQA = async (access_token, id, client, Service_key, params, type) => {
     var _a, _b, _c, _d;
     try {

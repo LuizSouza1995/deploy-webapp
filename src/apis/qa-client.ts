@@ -72,6 +72,38 @@ export const getQA = async (access_token: Token, data: any, client: string, Serv
     }
 };
 
+export const listQAChildFormsByFatherId = async (
+  access_token: Token,
+  client: string,
+  Service_key: string,
+  fatherId: string
+): Promise<any[]> => {
+  try {
+    const params = new URLSearchParams();
+    params.append("field", "workflow_form_father_id");
+    params.append("value", fatherId);
+    params.append("conditional", "=");
+    params.append("operator", "and");
+    params.set("size", "500");
+
+    const { data } = await axios.get(
+      `${urlQA}/${client}/${Service_key}/techforms/workflow-form?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    const items = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+    log(`${cor.White}List workflow-form children of ${fatherId} in QA Success (${items.length})${cor.Reset}`);
+    return items;
+  } catch (error: any) {
+    log(`${cor.Red}List workflow-form children of ${fatherId} in QA Error: ${error.response?.data?.message || error.response?.data?.error}${cor.Reset}`);
+    return [];
+  }
+};
+
 export const publishWorkflowQA = async (access_token: Token, id: string, client: string, Service_key: string, params: string, type: string) => {
     try {
         await axios.post(

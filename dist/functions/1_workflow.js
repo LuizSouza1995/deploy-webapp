@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Workflow = Workflow;
 const prod_client_1 = require("../apis/prod-client");
+const data_processing_1 = require("../utils/data-processing");
 const _1_1_workflow_group_1 = require("./1.1_workflow_group");
 const _1_2_workflow_group_item_1 = require("./1.2_workflow_group_item");
 async function Workflow(access_token_qa, access_token_prod, workflow, client, serviceKey, id, updateWorkflowData) {
-    var _a;
     if (workflow && client && serviceKey) {
         //////////////////////// WORKFLOW + WORKFLOW-GROUP ////////////////////////
         const groupId = workflow.workflow_group_id;
@@ -14,7 +14,7 @@ async function Workflow(access_token_qa, access_token_prod, workflow, client, se
             await (0, prod_client_1.getPROD)(access_token_prod, undefined, client, serviceKey, `techforms/workflow/${id}`, "workflow", id);
         }
         catch (err) {
-            if (((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.status) === 404) {
+            if ((0, data_processing_1.isNotFoundError)(err)) {
                 workflowProd = false;
             }
             else {

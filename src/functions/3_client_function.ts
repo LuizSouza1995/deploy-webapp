@@ -1,4 +1,5 @@
 import { createPROD, getPROD, updatePROD } from "../apis/prod-client";
+import { isNotFoundError } from "../utils/data-processing";
 import { getQA } from "../apis/qa-client";
 import { clientIdPROD, clientIdQA } from "../utils/constants";
 import { Token } from "../utils/types";
@@ -12,7 +13,7 @@ export async function ClientFunction(function_id: string, access_token_qa: Token
         try {
             await getPROD(access_token_prod, update_workflow_protocol_functionData, client!, serviceKey!, `client/${clientIdPROD}/client-function/${function_id}`, "update-workflow-protocol-function", function_id);
         } catch (err: any) {
-            if (err?.response?.status === 404) {
+            if (isNotFoundError(err)) {
                 protocolFunctionExistsInProd = false;
             } else {
                 throw err;

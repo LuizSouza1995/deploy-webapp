@@ -1,22 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WorkflowStepForms = WorkflowStepForms;
+const data_processing_1 = require("../utils/data-processing");
 const prod_client_1 = require("../apis/prod-client");
 const _2_1_1_workflow_forms_1 = require("./2.1.1_workflow_forms");
 async function WorkflowStepForms(workflowStepFormData, access_token_qa, access_token_prod, client, serviceKey, workflow_id, step_id, updateWorkflowData) {
-    var _a;
     //////////////////////// WORKFLOW STEPS FORMS ////////////////////////
     let workflowStepFormExistsInProd = true;
     //////////////////////// WORKFLOW FORMS ////////////////////////
     const workflowFormId = workflowStepFormData === null || workflowStepFormData === void 0 ? void 0 : workflowStepFormData.workflow_form_id;
+    const workflowFormReferenceId = workflowStepFormData === null || workflowStepFormData === void 0 ? void 0 : workflowStepFormData.workflow_form_reference_id;
     if (workflowFormId) {
-        await (0, _2_1_1_workflow_forms_1.WorkflowForms)({ id: workflowFormId }, access_token_qa, access_token_prod, client, serviceKey, workflow_id, updateWorkflowData);
+        await (0, _2_1_1_workflow_forms_1.WorkflowForms)({ id: workflowFormId, embedded: workflowStepFormData === null || workflowStepFormData === void 0 ? void 0 : workflowStepFormData.workflow_form }, access_token_qa, access_token_prod, client, serviceKey, workflow_id, updateWorkflowData);
+    }
+    if (workflowFormReferenceId && workflowFormReferenceId !== workflowFormId) {
+        await (0, _2_1_1_workflow_forms_1.WorkflowForms)({ id: workflowFormReferenceId, embedded: workflowStepFormData === null || workflowStepFormData === void 0 ? void 0 : workflowStepFormData.workflow_form_reference }, access_token_qa, access_token_prod, client, serviceKey, workflow_id, updateWorkflowData);
     }
     try {
         await (0, prod_client_1.getPROD)(access_token_prod, undefined, client, serviceKey, `techforms/workflow/${workflow_id}/workflow-step/${step_id}/workflow-step-form/${workflowStepFormData.id}`, "workflow-step-form", workflowStepFormData.id);
     }
     catch (err) {
-        if (((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.status) === 404) {
+        if ((0, data_processing_1.isNotFoundError)(err)) {
             workflowStepFormExistsInProd = false;
         }
         else {

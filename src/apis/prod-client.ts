@@ -1,7 +1,7 @@
 import axios from "axios";
 import { log } from "console";
 import { cor, replacementRules, urlPROD, urlQA, addIdUpdated, addIdsCreated, checkIdUpdated } from "../utils/constants";
-import { deleteKeys, omitNullProperties, sanitizeWorkflowFormData, sanitizeWorkflowStepData } from "../utils/data-processing";
+import { deleteKeys, omitNullProperties, sanitizeWorkflowFormData, sanitizeWorkflowGroupData, sanitizeWorkflowGroupItemData, sanitizeWorkflowStepData, sanitizeWorkflowStepFormData, isNotFoundError } from "../utils/data-processing";
 import { Token } from "../utils/types";
 import { replaceStringsRecursively } from "../utils/replace-utils";
 
@@ -72,7 +72,10 @@ export const getPROD = async (access_token: Token, data: any, client: string, Se
     );
 
     if (type === "workflow-form" && data === "") {
-      return null;
+      throw {
+        status: 404,
+        error: "Data not found",
+      };
     }
 
     deleteKeys(data, [
@@ -130,7 +133,6 @@ export const createPROD = async (access_token: Token, data: any, client: string,
         payload.index = 1;
       }
     } else if (type === "update-workflow-protocol-function") {
-      data.function = jsonData.updateWorkflowProtocolFunction || data.function
       payload = data;
     } else if (type === "workflow") {
       data.flow_form_id = jsonData.flow_form_id || data.flow_form_id
@@ -139,20 +141,27 @@ export const createPROD = async (access_token: Token, data: any, client: string,
       deleteKeys(data, WORKFLOW_PROD_STRIP_KEYS);
       payload = omitNullProperties({ ...data });
     } else if (type === "workflow-step-form") {
-      if (data.has_next_workflow_form === null || data.has_previous_workflow_form === null) {
-        data.has_next_workflow_form = false;
-      }
-      payload = data;
+      payload = sanitizeWorkflowStepFormData(data);
+      payload.id = id;
     } else if (type === "workflow-step") {
       payload = sanitizeWorkflowStepData(data);
+      payload.id = id;
+    } else if (type === "workflow-group") {
+      payload = sanitizeWorkflowGroupData(data, false);
+    } else if (type === "workflow-group-item") {
+      const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
+      payload = sanitizeWorkflowGroupItemData(data, groupIdMatch?.[1]);
     } else {
       payload = data;
     }
 
     payload = replaceStringsRecursively(payload, replacementRules);
 
+    const createParams =
+      type === "workflow-step-form" ? `${params}/${id}` : params;
+
     let { data: createData } = await axios.post(
-      `${urlPROD}/${client}/${Service_key}/${params}`,
+      `${urlPROD}/${client}/${Service_key}/${createParams}`,
       payload,
       {
         headers: {
@@ -172,7 +181,7 @@ export const createPROD = async (access_token: Token, data: any, client: string,
 
 export const updatePROD = async (access_token: Token, data: any, client: string, Service_key: string, params: string, type: string, id: string, jsonData: any) => {
   try {
-    if (!checkIdUpdated(id)) {
+    if (!checkIdUpdated(id, type)) {
       let payload;
       if (type === "workflow-form") {
         payload = sanitizeWorkflowFormData(data);
@@ -193,8 +202,6 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
           payload.index = 1;
         }
       } else if (type === "update-workflow-protocol-function") {
-        id = "9a37558f-1f11-4544-9a31-754e24883673"
-        data.function = jsonData.updateWorkflowProtocolFunction
         payload = data;
       } else if (type === "workflow") {
         payload = {
@@ -219,12 +226,14 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
         };
         payload = omitNullProperties(payload);
       } else if (type === "workflow-step-form") {
-        if (data.has_next_workflow_form === null || data.has_previous_workflow_form === null) {
-          data.has_next_workflow_form = false;
-        }
-        payload = data;
+        payload = sanitizeWorkflowStepFormData(data);
       } else if (type === "workflow-step") {
         payload = sanitizeWorkflowStepData(data);
+      } else if (type === "workflow-group") {
+        payload = sanitizeWorkflowGroupData(data, true);
+      } else if (type === "workflow-group-item") {
+        const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
+        payload = sanitizeWorkflowGroupItemData(data, groupIdMatch?.[1]);
       } else {
         payload = data;
       }
@@ -248,7 +257,7 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
   } catch (error: any) {
     log(`${cor.Red}Update ${type} ${id} in PROD Error: ${JSON.stringify(error.response?.data || error.response?.data?.error || error.message || error.stack || error)}${cor.Reset}`);
     if (error?.status === 404) {
-      createPROD(access_token, data, client, Service_key, params, type, id, data);
+      createPROD(access_token, data, client, Service_key, params, type, id, jsonData);
     }
     throw error;
   }

@@ -1,22 +1,27 @@
 import { Token } from "../utils/types";
 import { getQA } from "../apis/qa-client";
 import { createPROD, getPROD, updatePROD } from "../apis/prod-client";
+import { isNotFoundError } from "../utils/data-processing";
 
 export async function WorkflowGroupItem(workflowGroupItems: any, access_token_qa: Token, access_token_prod: Token, client: string, serviceKey: string, workflow_id: string, updateWorkflowData: any) {
     if (workflowGroupItems.length > 0 && client && serviceKey && workflow_id) {
         //////////////////////// WORKFLOW-GROUP-ITEM ////////////////////////
         for (const groupItem of workflowGroupItems) {
-            const groupItemData = await getQA(access_token_qa, undefined, client!, serviceKey!, `techforms/workflow-group/${workflow_id}/workflow-group-item/${groupItem.id}`, "workflow-group-item", groupItem.id);
             const groupId = groupItem.workflow_group_id;
 
             if (!groupId) continue;
+
+            const groupItemData = await getQA(access_token_qa, undefined, client!, serviceKey!, `techforms/workflow-group/${groupId}/workflow-group-item/${groupItem.id}`, "workflow-group-item", groupItem.id);
+            if (groupItemData && !groupItemData.workflow_group_id) {
+                groupItemData.workflow_group_id = groupId;
+            }
 
             // Garantir que o grupo existe em prod ANTES de criar o item
             let groupExistsInProd = true;
             try {
                 await getPROD(access_token_prod, undefined, client!, serviceKey!, `techforms/workflow-group/${groupId}`, "workflow-group", groupId);
             } catch (err: any) {
-                if (err?.response?.status === 404) {
+                if (isNotFoundError(err)) {
                     groupExistsInProd = false;
                 } else {
                     throw err;
@@ -29,9 +34,9 @@ export async function WorkflowGroupItem(workflowGroupItems: any, access_token_qa
 
             let existsInProd = true;
             try {
-                await getPROD(access_token_prod, undefined, client!, serviceKey!, `techforms/workflow-group/${workflow_id}/workflow-group-item/${groupItem.id}`, "workflow-group-item", groupItem.id);
+                await getPROD(access_token_prod, undefined, client!, serviceKey!, `techforms/workflow-group/${groupId}/workflow-group-item/${groupItem.id}`, "workflow-group-item", groupItem.id);
             } catch (err: any) {
-                if (err?.response?.status === 404) {
+                if (isNotFoundError(err)) {
                     existsInProd = false;
                 } else {
                     throw err;
