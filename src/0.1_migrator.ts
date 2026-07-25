@@ -10,6 +10,7 @@ import { WorkflowForms } from "./functions/2.1.1_workflow_forms";
 import { ClientFunction } from "./functions/3_client_function";
 import { WorkflowFormGroups } from "./functions/4_workflow_form_groups";
 import { Workflow } from "./functions/1_workflow";
+import { HomeSettings } from "./functions/5_home_settings";
 import { collectChildFormIdsFromWorkflow } from "./utils/data-processing";
 
 export const runMigration = async () => {
@@ -58,6 +59,8 @@ export const runMigration = async () => {
     id: row.workflow_id
   }));
 
+  const processedClientServices = new Set<string>();
+
   const execute = async (info: WorkflowsIds) => {
     try {
       //////////////////////// PUBLISH WORKFLOW QA ////////////////////////
@@ -73,6 +76,13 @@ export const runMigration = async () => {
       }
 
       await Workflow(access_token_qa, access_token_prod, workflow, client!, serviceKey!, info.id, updateWorkflowData);
+
+      //////////////////////// HOME SETTINGS (uma vez por client_service) ////////////////////////
+      const clientServiceId = workflow.client_service_id;
+      if (clientServiceId && !processedClientServices.has(clientServiceId)) {
+        processedClientServices.add(clientServiceId);
+        await HomeSettings(clientServiceId, access_token_qa, access_token_prod, client, serviceKey, updateWorkflowData);
+      }
 
       //////////////////////// WORKFLOW STEPS ////////////////////////
       const workflowSteps = workflow.workflow_steps;
@@ -95,7 +105,12 @@ export const runMigration = async () => {
       //////////////////////// PUBLISH WORKFLOW PROD ////////////////////////
       await publishWorkflowPROD(access_token_prod, info.id, client!, serviceKey!, `techforms/workflow/${info.id}`, "workflow");
     } catch (error: any) {
-      log(`${cor.Red}Error to process ID ${info.id}: ${JSON.stringify(error?.response?.data?.message)}${cor.Reset}`);
+      const errorDetail =
+        error?.response?.data?.message ??
+        error?.response?.data ??
+        error?.message ??
+        error;
+      log(`${cor.Red}Error to process ID ${info.id}: ${JSON.stringify(errorDetail)}${cor.Reset}`);
     }
   };
 

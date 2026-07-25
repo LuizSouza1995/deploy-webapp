@@ -45,6 +45,7 @@ const _2_1_1_workflow_forms_1 = require("./functions/2.1.1_workflow_forms");
 const _3_client_function_1 = require("./functions/3_client_function");
 const _4_workflow_form_groups_1 = require("./functions/4_workflow_form_groups");
 const _1_workflow_1 = require("./functions/1_workflow");
+const _5_home_settings_1 = require("./functions/5_home_settings");
 const data_processing_1 = require("./utils/data-processing");
 const runMigration = async () => {
     if (!constants_1.emailLoginQA || !constants_1.passwordLoginQA || !constants_1.emailLoginPROD || !constants_1.passwordLoginPROD || !constants_1.client || !constants_1.serviceKey) {
@@ -84,8 +85,9 @@ const runMigration = async () => {
     const arrayIds = jsonArray.map((row) => ({
         id: row.workflow_id
     }));
+    const processedClientServices = new Set();
     const execute = async (info) => {
-        var _a, _b;
+        var _a, _b, _c, _d, _e, _f;
         try {
             //////////////////////// PUBLISH WORKFLOW QA ////////////////////////
             await (0, qa_client_1.publishWorkflowQA)(access_token_qa, info.id, constants_1.client, constants_1.serviceKey, `techforms/workflow/${info.id}`, "workflow");
@@ -97,6 +99,12 @@ const runMigration = async () => {
                 return;
             }
             await (0, _1_workflow_1.Workflow)(access_token_qa, access_token_prod, workflow, constants_1.client, constants_1.serviceKey, info.id, updateWorkflowData);
+            //////////////////////// HOME SETTINGS (uma vez por client_service) ////////////////////////
+            const clientServiceId = workflow.client_service_id;
+            if (clientServiceId && !processedClientServices.has(clientServiceId)) {
+                processedClientServices.add(clientServiceId);
+                await (0, _5_home_settings_1.HomeSettings)(clientServiceId, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, updateWorkflowData);
+            }
             //////////////////////// WORKFLOW STEPS ////////////////////////
             const workflowSteps = workflow.workflow_steps;
             await (0, _2_workflow_step_1.WorkflowSteps)(workflowSteps, access_token_qa, access_token_prod, constants_1.client, constants_1.serviceKey, info.id, undefined, updateWorkflowData);
@@ -115,7 +123,8 @@ const runMigration = async () => {
             await (0, prod_client_1.publishWorkflowPROD)(access_token_prod, info.id, constants_1.client, constants_1.serviceKey, `techforms/workflow/${info.id}`, "workflow");
         }
         catch (error) {
-            (0, console_1.log)(`${constants_1.cor.Red}Error to process ID ${info.id}: ${JSON.stringify((_b = (_a = error === null || error === void 0 ? void 0 : error.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message)}${constants_1.cor.Reset}`);
+            const errorDetail = (_f = (_e = (_c = (_b = (_a = error === null || error === void 0 ? void 0 : error.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message) !== null && _c !== void 0 ? _c : (_d = error === null || error === void 0 ? void 0 : error.response) === null || _d === void 0 ? void 0 : _d.data) !== null && _e !== void 0 ? _e : error === null || error === void 0 ? void 0 : error.message) !== null && _f !== void 0 ? _f : error;
+            (0, console_1.log)(`${constants_1.cor.Red}Error to process ID ${info.id}: ${JSON.stringify(errorDetail)}${constants_1.cor.Reset}`);
         }
     };
     for (const info of arrayIds) {

@@ -6,6 +6,8 @@ exports.sanitizeWorkflowStepData = sanitizeWorkflowStepData;
 exports.sanitizeWorkflowStepFormData = sanitizeWorkflowStepFormData;
 exports.sanitizeWorkflowGroupData = sanitizeWorkflowGroupData;
 exports.sanitizeWorkflowGroupItemData = sanitizeWorkflowGroupItemData;
+exports.mapClientServiceIdToProd = mapClientServiceIdToProd;
+exports.sanitizeHomeSettingData = sanitizeHomeSettingData;
 exports.omitNullProperties = omitNullProperties;
 exports.isNotFoundError = isNotFoundError;
 exports.collectChildFormIdsFromForm = collectChildFormIdsFromForm;
@@ -139,6 +141,42 @@ function sanitizeWorkflowGroupItemData(itemData, workflowGroupId) {
     if (itemData.icon_id != null && String(itemData.icon_id).trim() !== "") {
         payload.icon_id = itemData.icon_id;
     }
+    return omitNullProperties(payload);
+}
+/** Maps known QA client_service_id values to PROD equivalents. */
+function mapClientServiceIdToProd(clientServiceId) {
+    if (!clientServiceId)
+        return clientServiceId;
+    if (clientServiceId === "2ace827e-3378-4c1b-a5bc-5174109e6892") {
+        return "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729";
+    }
+    return clientServiceId;
+}
+function nonEmptyString(value, fallback = "   ") {
+    if (typeof value === "string" && value.trim().length > 0)
+        return value;
+    return fallback;
+}
+/** Home-setting PROD body: strip nested relations the API rejects. */
+function sanitizeHomeSettingData(homeSetting) {
+    var _a, _b;
+    if (!homeSetting || typeof homeSetting !== "object")
+        return homeSetting;
+    const payload = {
+        id: homeSetting.id,
+        name: nonEmptyString(homeSetting.name),
+        description: nonEmptyString(homeSetting.description),
+        type: homeSetting.type,
+        layout: homeSetting.layout,
+        index: homeSetting.index,
+        client_function_id: homeSetting.client_function_id,
+        client_service_id: mapClientServiceIdToProd(homeSetting.client_service_id),
+        client_service_key: homeSetting.client_service_key,
+        filters: (_a = homeSetting.filters) !== null && _a !== void 0 ? _a : {},
+        enabled: (_b = homeSetting.enabled) !== null && _b !== void 0 ? _b : true,
+        optional_config: homeSetting.optional_config,
+        client_id: homeSetting.client_id,
+    };
     return omitNullProperties(payload);
 }
 /** Shallow copy: drops keys whose value is `null` (axios/JSON would send null otherwise). */

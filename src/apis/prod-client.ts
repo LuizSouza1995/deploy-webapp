@@ -1,7 +1,7 @@
 import axios from "axios";
 import { log } from "console";
 import { cor, replacementRules, urlPROD, urlQA, addIdUpdated, addIdsCreated, checkIdUpdated } from "../utils/constants";
-import { deleteKeys, omitNullProperties, sanitizeWorkflowFormData, sanitizeWorkflowGroupData, sanitizeWorkflowGroupItemData, sanitizeWorkflowStepData, sanitizeWorkflowStepFormData, isNotFoundError } from "../utils/data-processing";
+import { deleteKeys, omitNullProperties, mapClientServiceIdToProd, sanitizeHomeSettingData, sanitizeWorkflowFormData, sanitizeWorkflowGroupData, sanitizeWorkflowGroupItemData, sanitizeWorkflowStepData, sanitizeWorkflowStepFormData, isNotFoundError } from "../utils/data-processing";
 import { Token } from "../utils/types";
 import { replaceStringsRecursively } from "../utils/replace-utils";
 
@@ -151,6 +151,8 @@ export const createPROD = async (access_token: Token, data: any, client: string,
     } else if (type === "workflow-group-item") {
       const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
       payload = sanitizeWorkflowGroupItemData(data, groupIdMatch?.[1]);
+    } else if (type === "home-setting") {
+      payload = sanitizeHomeSettingData(data);
     } else {
       payload = data;
     }
@@ -220,7 +222,7 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
           workflow_key: data.workflow_key,
           get_external_identification_function: data.get_external_identification_function,
           get_main_user_account_data_function: data.get_main_user_account_data_function,
-          client_service_id: data.client_service_id === "2ace827e-3378-4c1b-a5bc-5174109e6892" ? "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729" : data.client_service_id,
+          client_service_id: mapClientServiceIdToProd(data.client_service_id),
           // client_service_id: "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729",
           update_workflow_protocol_function_id: data.update_workflow_protocol_function_id,
         };
@@ -234,6 +236,8 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
       } else if (type === "workflow-group-item") {
         const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
         payload = sanitizeWorkflowGroupItemData(data, groupIdMatch?.[1]);
+      } else if (type === "home-setting") {
+        payload = sanitizeHomeSettingData(data);
       } else {
         payload = data;
       }

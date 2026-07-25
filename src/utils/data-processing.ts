@@ -141,6 +141,43 @@ export function sanitizeWorkflowGroupItemData(
   return omitNullProperties(payload);
 }
 
+/** Maps known QA client_service_id values to PROD equivalents. */
+export function mapClientServiceIdToProd(clientServiceId: string | null | undefined): string | null | undefined {
+  if (!clientServiceId) return clientServiceId;
+  if (clientServiceId === "2ace827e-3378-4c1b-a5bc-5174109e6892") {
+    return "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729";
+  }
+  return clientServiceId;
+}
+
+function nonEmptyString(value: unknown, fallback = "   "): string {
+  if (typeof value === "string" && value.trim().length > 0) return value;
+  return fallback;
+}
+
+/** Home-setting PROD body: strip nested relations the API rejects. */
+export function sanitizeHomeSettingData(homeSetting: any): Record<string, any> {
+  if (!homeSetting || typeof homeSetting !== "object") return homeSetting;
+
+  const payload: Record<string, any> = {
+    id: homeSetting.id,
+    name: nonEmptyString(homeSetting.name),
+    description: nonEmptyString(homeSetting.description),
+    type: homeSetting.type,
+    layout: homeSetting.layout,
+    index: homeSetting.index,
+    client_function_id: homeSetting.client_function_id,
+    client_service_id: mapClientServiceIdToProd(homeSetting.client_service_id),
+    client_service_key: homeSetting.client_service_key,
+    filters: homeSetting.filters ?? {},
+    enabled: homeSetting.enabled ?? true,
+    optional_config: homeSetting.optional_config,
+    client_id: homeSetting.client_id,
+  };
+
+  return omitNullProperties(payload);
+}
+
 /** Shallow copy: drops keys whose value is `null` (axios/JSON would send null otherwise). */
 export function omitNullProperties(obj: Record<string, any>): Record<string, any> {
   if (!obj || typeof obj !== "object") return obj;
