@@ -54,27 +54,24 @@ URL_PROD=https://url-prod.com
 
 ### 3. Preparar Arquivos de Configuração
 
-#### `src/utils/ids.csv`
-
-Arquivo CSV com os IDs dos workflows a serem migrados. Formato:
-
-```csv
-workflow_id
-d8e1d640-f734-4051-b296-1938cbf47e86
-outro-workflow-id
-```
-
 #### `src/utils/updateWorkflow.json`
 
-Arquivo JSON com configurações de atualização do workflow. Exemplo:
+Arquivo JSON com os IDs dos workflows a serem migrados (campo `workflows`) e as configurações de atualização do workflow. Exemplo:
 
 ```json
 {
   "flow_form_id": "id do form de produção",
+  "protocol_provider": "força/identificador do provedor de protocolo (se tiver)",
   "pendency_custom_filters": "função stringficada (se tiver)", // DICA: coloque os ids de QA e de PROD junto, feito isso nao tera problemas em deploys futuros
-  "updateWorkflowProtocolFunction": "função stringficada (se tiver)" // DICA: coloque os ids de QA e de PROD junto, feito isso nao tera problemas em deploys futuros
+  "updateWorkflowProtocolFunction": "função stringficada (se tiver)", // DICA: coloque os ids de QA e de PROD junto, feito isso nao tera problemas em deploys futuros
+  "workflows": [
+    "d8e1d640-f734-4051-b296-1938cbf47e86",
+    "outro-workflow-id"
+  ]
 }
 ```
+
+O campo `workflows` substitui o antigo `ids.csv`: é essa lista de IDs que o migrator percorre para processar cada workflow.
 
 ## 📁 Estrutura de Arquivos
 
@@ -98,8 +95,7 @@ deployWebApp/
 │   └── utils/
 │       ├── constants.ts          # Constantes e configurações
 │       ├── data-processing.ts   # Processamento de dados
-│       ├── ids.csv              # IDs dos workflows
-│       ├── updateWorkflow.json  # Configurações de atualização
+│       ├── updateWorkflow.json  # IDs dos workflows + configurações de atualização
 │       ├── history_created.txt  # Histórico de criados
 │       └── history_updated.txt  # Histórico de atualizados
 └── package.json
@@ -118,7 +114,7 @@ npm start
 O script irá:
 1. Limpar os históricos anteriores
 2. Fazer login nos ambientes QA e PROD
-3. Processar cada workflow do arquivo `ids.csv`
+3. Processar cada workflow listado no campo `workflows` de `updateWorkflow.json`
 4. Exibir logs de progresso
 5. Salvar histórico de operações
 
@@ -293,7 +289,7 @@ export const replacementRules = [
 
 **Causa:** O workflow não existe no ambiente QA.
 
-**Solução:** Verifique se o ID do workflow está correto no arquivo `ids.csv`.
+**Solução:** Verifique se o ID do workflow está correto no campo `workflows` de `updateWorkflow.json`.
 
 ### CREATE executado após "DEPLOYMENT COMPLETED!"
 

@@ -43,7 +43,6 @@ const projectRoot = findProjectRoot(packagePath);
 
 // Arquivos a serem copiados (com seus caminhos de origem)
 const filesToCopy = [
-  { source: path.join(utilsPath, 'ids.csv'), dest: 'ids.csv' },
   { source: path.join(utilsPath, 'updateWorkflow.json'), dest: 'updateWorkflow.json' },
   { source: path.join(packagePath, 'README.md'), dest: 'README.md' },
   { source: path.join(utilsPath, 'history_created.txt'), dest: 'history_created.txt' },
@@ -246,9 +245,8 @@ if (copiedCount > 0) {
   console.log(`\n📝 Arquivos criados em: ${projectRoot}`);
   console.log('\n📋 Próximos passos:');
   console.log('   1. 🔐 Edite .env com suas credenciais (substitua os valores de exemplo)');
-  console.log('   2. ✏️  Edite ids.csv com os IDs dos workflows que deseja migrar');
-  console.log('   3. ✏️  Edite updateWorkflow.json com suas configurações específicas');
-  console.log('   4. 🚀 Execute: yarn start ou npm start\n');
+  console.log('   2. ✏️  Edite updateWorkflow.json com os IDs dos workflows (campo "workflows") e demais configurações');
+  console.log('   3. 🚀 Execute: yarn start ou npm start\n');
   console.log('💡 Dica: Tudo está configurado! Basta preencher os valores e executar yarn start!\n');
 } else {
   console.log('\nℹ️  deploy-webapp: Todos os arquivos já existem na raiz do projeto.');

@@ -3,12 +3,9 @@
   "version": "1.0.22",
   "description": "Script para deploy de esteiras no WebApp.",
   "main": "dist/0_index.js",
-  "bin": {
-    "deploy-webapp": "./dist/0_index.js"
-  },
+  "bin": "./dist/0_index.js",
   "files": [
     "dist",
-    "src/utils/*.csv",
     "src/utils/*.json",
     "install.js",
     "README.md"
@@ -22,7 +19,6 @@
   },
   "dependencies": {
     "axios": "^1.12.2",
-    "csvtojson": "^2.0.10",
     "dotenv": "^17.2.3",
     "fs": "^0.0.1-security",
     "ts-node-dev": "^2.0.0"

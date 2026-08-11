@@ -1,4 +1,22 @@
 {
   "flow_form_id": "81cb37f8-86b0-4af1-befa-3d44a763b96a",
-  "protocol_provider": "force"
+  "protocol_provider": "force",
+  "workflows": [
+    "cc9282c7-d10e-4c64-a37a-8d4e2fa9880a",
+    "f5f70d77-2242-4448-908d-0011f29859d7",
+    "f8be0d7d-d8ac-45de-a534-5fe5230e06b1",
+    "c8131f1a-cca2-489b-962e-f69a9d8a58c2",
+    "af7ecc77-0e67-4f65-9645-7cbc2a5ffe97",
+    "61ac0a9f-a22c-41a1-b63e-df15506d718a",
+    "169b2f87-d198-4b3e-80ee-a5727481e520",
+    "69796293-59fc-4803-9549-dea5b96b634d",
+    "f176a9fd-ed13-4bde-bd9a-d0568dedf3ee",
+    "9c891d23-b7ac-49c5-85fb-5326901938f9",
+    "0d041c8e-58a3-48b1-b862-0659e26752bf",
+    "7c7c0835-af08-407b-904c-fe21f105f35d",
+    "f942a01d-8b7a-48c5-a72e-b0cef2a787e3",
+    "d6d56ffb-65bc-4b36-b847-684203cedaaf",
+    "89231abd-68bc-42f6-882f-a6da697f9baa",
+    "6ee19eee-1867-4b39-9d8a-0bcc324218bf"
+  ]
 }

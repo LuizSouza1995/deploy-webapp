@@ -70,20 +70,14 @@ const runMigration = async () => {
     }
     const filesDirectory = getFilesDirectory();
     const updateWorkflow = path.resolve(filesDirectory, "updateWorkflow.json");
-    const csvFilePath = path.resolve(filesDirectory, "ids.csv");
-    // Verificar se os arquivos existem
+    // Verificar se o arquivo existe
     if (!fs.existsSync(updateWorkflow)) {
         throw new Error(`Arquivo updateWorkflow.json não encontrado em: ${filesDirectory}\nCertifique-se de que o arquivo está no local correto.`);
     }
-    if (!fs.existsSync(csvFilePath)) {
-        throw new Error(`Arquivo ids.csv não encontrado em: ${filesDirectory}\nCertifique-se de que o arquivo está no local correto.`);
-    }
     const getUpdateWorkflow = fs.readFileSync(updateWorkflow, "utf8");
     const updateWorkflowData = JSON.parse(getUpdateWorkflow);
-    const csv = require("csvtojson");
-    const jsonArray = await csv({ delimiter: ";" }).fromFile(csvFilePath);
-    const arrayIds = jsonArray.map((row) => ({
-        id: row.workflow_id
+    const arrayIds = (updateWorkflowData.workflows || []).map((id) => ({
+        id
     }));
     const processedClientServices = new Set();
     const execute = async (info) => {
