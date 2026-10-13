@@ -1,4 +1,26 @@
 {
   "flow_form_id": "c4fe4bae-4dcc-4a1e-b594-414914839546",
-  "protocol_provider": "force"
+  "protocol_provider": "force",
+  "workflows": [
+    "6eb9a91b-a63d-4ab7-998a-7d410d225b92",
+    "f5f45405-e04f-4cd9-840c-3327bdef9091",
+    "fce3a8ef-9f6a-4b0d-9ce4-5d4cccb3fc85",
+    "f3e85c99-d9c3-4c7f-894a-0ea24baac1e6",
+    "23495f75-e471-4880-842e-94d3b04d05e3",
+    "6023d43d-aef4-44e9-8475-d0305378d854",
+    "19ce316a-86e9-46ec-98fd-0982351b199f",
+    "64ffca99-41ea-497c-9c25-b9c7c331df7a",
+    "aad5a25a-ffb2-4a11-a264-0adf00fc666d",
+    "d1ef63cb-78c0-426a-813b-71184ab30734",
+    "10ba48d7-01d6-49da-91a2-dda263d9f6d0",
+    "e909b35f-0921-4c1c-8423-f71663d65cd5",
+    "1a83e663-3291-4215-8233-cd22205bbaa5",
+    "9eb783be-0449-4a08-bae5-4c2c27f88515",
+    "722fa3d0-f1f7-4b6a-b702-6b9339421334",
+    "0918fb95-2f00-43d3-aa21-341080008646",
+    "b577fe7b-9fd5-41d2-8a47-82252edc0a9e",
+    "936826cb-dc44-4230-b32f-30faacfef3c1",
+    "45be6c31-b459-4365-a3b3-2dd5949b2882",
+    "f7361f77-cd94-46b4-9db2-8c215781aeab"
+  ]
 }

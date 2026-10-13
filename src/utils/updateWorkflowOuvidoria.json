@@ -1,4 +1,8 @@
 {
-  "flow_form_id": "6c1d5b15-c4f7-4fd8-97fa-aa8522d0a20a",
-  "protocol_provider": "real_customer"
+  "flow_form_id": "905a1023-8dfe-42f1-b151-2ee2df75aa60",
+  "protocol_provider": "force",
+  "workflows": [
+    "d8e1d640-f734-4051-b296-1938cbf47e86",
+    "d4238713-0be1-4684-a0fb-50a2d2a0fff3"
+  ]
 }
