@@ -27,12 +27,15 @@ async function WorkflowGroup(groupId, access_token_qa, access_token_prod, client
         }
         else {
             await (0, prod_client_1.createPROD)(access_token_prod, workflowGroup, client, serviceKey, `techforms/workflow-group/${groupId}`, "workflow-group", groupId, updateWorkflowData);
-            if (workflowProd) {
-                await (0, prod_client_1.updatePROD)(access_token_prod, workflow, client, serviceKey, `techforms/workflow/${workflow_id}`, "workflow", workflow_id, updateWorkflowData);
-            }
-            else {
-                await (0, prod_client_1.createPROD)(access_token_prod, workflow, client, serviceKey, `techforms/workflow/${workflow_id}`, "workflow", workflow_id, updateWorkflowData);
-            }
+        }
+        // O workflow (cabeçalho de submenu) é sempre sincronizado DEPOIS do grupo, exista ele ou não em PROD.
+        // Cenário que exigia isso: grupo novo criado antes (ex.: pelo WorkflowGroupItem de uma esteira filha
+        // processada primeiro) — nesse caso o grupo já existe quando o workflow pai chega, e o pai nunca era criado/atualizado.
+        if (workflowProd) {
+            await (0, prod_client_1.updatePROD)(access_token_prod, workflow, client, serviceKey, `techforms/workflow/${workflow_id}`, "workflow", workflow_id, updateWorkflowData);
+        }
+        else {
+            await (0, prod_client_1.createPROD)(access_token_prod, workflow, client, serviceKey, `techforms/workflow/${workflow_id}`, "workflow", workflow_id, updateWorkflowData);
         }
     }
     else {

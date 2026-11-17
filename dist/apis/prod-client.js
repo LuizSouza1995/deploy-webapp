@@ -137,8 +137,10 @@ const createPROD = async (access_token, data, client, Service_key, params, type,
             data.flow_form_id = jsonData.flow_form_id || data.flow_form_id;
             data.pendency_custom_filters = jsonData.pendency_custom_filters || data.pendency_custom_filters;
             data.client_service_id = data.client_service_id;
+            // workflow_group_id (esteira que é cabeçalho de submenu) precisa ir para PROD: o grupo já foi criado antes (1.1_workflow_group)
+            const workflowGroupId = data.workflow_group_id;
             (0, data_processing_1.deleteKeys)(data, WORKFLOW_PROD_STRIP_KEYS);
-            payload = (0, data_processing_1.omitNullProperties)(Object.assign({}, data));
+            payload = (0, data_processing_1.omitNullProperties)(Object.assign(Object.assign({}, data), { workflow_group_id: workflowGroupId }));
         }
         else if (type === "workflow-step-form") {
             payload = (0, data_processing_1.sanitizeWorkflowStepFormData)(data);
@@ -154,6 +156,8 @@ const createPROD = async (access_token, data, client, Service_key, params, type,
         else if (type === "workflow-group-item") {
             const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
             payload = (0, data_processing_1.sanitizeWorkflowGroupItemData)(data, groupIdMatch === null || groupIdMatch === void 0 ? void 0 : groupIdMatch[1]);
+            // Mantém o mesmo id da QA no item (senão a API gera um id novo e QA/PROD divergem)
+            payload.id = id;
         }
         else if (type === "home-setting") {
             payload = (0, data_processing_1.sanitizeHomeSettingData)(data);
@@ -225,6 +229,7 @@ const updatePROD = async (access_token, data, client, Service_key, params, type,
                     client_service_id: (0, data_processing_1.mapClientServiceIdToProd)(data.client_service_id),
                     // client_service_id: "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729",
                     update_workflow_protocol_function_id: data.update_workflow_protocol_function_id,
+                    workflow_group_id: data.workflow_group_id,
                 };
                 payload = (0, data_processing_1.omitNullProperties)(payload);
             }

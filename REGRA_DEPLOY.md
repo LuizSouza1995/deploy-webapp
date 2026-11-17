@@ -83,17 +83,23 @@ Qualquer erro não-404 em qualquer etapa é capturado no nível de `execute(info
 
 ### 3.1 Workflow / Workflow Group / Workflow Group Item
 
-- Se `workflow.workflow_group_id` existir, a decisão de create/update do **workflow** é
-  delegada ao processamento do **grupo**:
-  - Se o grupo **já existe** em PROD → apenas `updatePROD` do grupo (o workflow em si é tratado
-    fora, no fluxo normal de `Workflow`).
-  - Se o grupo **não existe** em PROD → `createPROD` do grupo **e então** create/update do
-    workflow (grupo sempre antes do workflow).
+- Se `workflow.workflow_group_id` existir (esteira que é cabeçalho de submenu), o **grupo** é
+  sincronizado primeiro e o **workflow** depois, sempre:
+  - Grupo **não existe** em PROD → `createPROD` do grupo.
+  - Grupo **já existe** em PROD (inclusive quando acabou de ser criado pelo item de uma esteira
+    filha processada antes) → `updatePROD` do grupo.
+  - Em ambos os casos, em seguida o workflow é criado/atualizado em PROD **já com
+    `workflow_group_id`** (o campo é enviado no create e no update). Antes, com o grupo já
+    existente o workflow pai não era sincronizado — por isso grupos novos ficavam sem a esteira
+    pai e o assunto não aparecia no menu.
 - Se não houver `workflow_group_id`, o workflow é persistido diretamente
   (`updatePROD`/`createPROD` conforme exista ou não em PROD).
 - Depois do workflow, cada item de `workflow.workflow_group_item` é sincronizado
   (`WorkflowGroupItem`): garante que o grupo exista em PROD antes de criar/atualizar o item, e
-  preenche `workflow_group_id` no item quando ausente.
+  preenche `workflow_group_id` no item quando ausente. O item é localizado em PROD primeiro por
+  id e, se não achar, por `workflow_id` dentro do grupo (a API gera um id novo no POST, então o
+  id da QA não bate em PROD): achou → PUT no item existente; não achou → POST. Isso evita
+  duplicar o item a cada deploy.
 
 ### 3.2 Workflow Steps
 

@@ -138,8 +138,10 @@ export const createPROD = async (access_token: Token, data: any, client: string,
       data.flow_form_id = jsonData.flow_form_id || data.flow_form_id
       data.pendency_custom_filters = jsonData.pendency_custom_filters || data.pendency_custom_filters
       data.client_service_id = data.client_service_id
+      // workflow_group_id (esteira que é cabeçalho de submenu) precisa ir para PROD: o grupo já foi criado antes (1.1_workflow_group)
+      const workflowGroupId = data.workflow_group_id;
       deleteKeys(data, WORKFLOW_PROD_STRIP_KEYS);
-      payload = omitNullProperties({ ...data });
+      payload = omitNullProperties({ ...data, workflow_group_id: workflowGroupId });
     } else if (type === "workflow-step-form") {
       payload = sanitizeWorkflowStepFormData(data);
       payload.id = id;
@@ -151,6 +153,8 @@ export const createPROD = async (access_token: Token, data: any, client: string,
     } else if (type === "workflow-group-item") {
       const groupIdMatch = params.match(/workflow-group\/([^/]+)\/workflow-group-item/);
       payload = sanitizeWorkflowGroupItemData(data, groupIdMatch?.[1]);
+      // Mantém o mesmo id da QA no item (senão a API gera um id novo e QA/PROD divergem)
+      payload.id = id;
     } else if (type === "home-setting") {
       payload = sanitizeHomeSettingData(data);
     } else {
@@ -225,6 +229,7 @@ export const updatePROD = async (access_token: Token, data: any, client: string,
           client_service_id: mapClientServiceIdToProd(data.client_service_id),
           // client_service_id: "8c8ab6bf-c907-4e3a-bb57-5e546dd5e729",
           update_workflow_protocol_function_id: data.update_workflow_protocol_function_id,
+          workflow_group_id: data.workflow_group_id,
         };
         payload = omitNullProperties(payload);
       } else if (type === "workflow-step-form") {
